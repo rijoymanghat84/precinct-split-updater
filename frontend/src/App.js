@@ -21,7 +21,7 @@ function App() {
     'integer','boolean','text','paragraph','sentence','precinct','precinctsplit',
     'partyname','partyname1','resaddress','mailaddress','id','appcode','partycode',
     'fullname','name','street','color','currency','price','latitude','longitude',
-    'license','ssn','ipv4','ipv6','mac'
+    'license','ipv4','ipv6','mac'
   ]);
 
   const handleFileChange = (e) => {
@@ -64,7 +64,7 @@ function App() {
         a.click();
         document.body.removeChild(a);
         window.URL.revokeObjectURL(url);
-        setMessage({ type: 'success', text: 'CSV processed! Download started.' });
+        setMessage({ type: 'success', text: 'File processed! Download started.' });
       } else {
         const error = await response.json();
         setMessage({ type: 'error', text: error.error || 'Processing failed' });
@@ -102,7 +102,7 @@ function App() {
         a.click();
         document.body.removeChild(a);
         window.URL.revokeObjectURL(url);
-        setFakeMessage({ type: 'success', text: `Generated ${numRows} rows! Download started.` });
+        setFakeMessage({ type: 'success', text: `Generated ${numRows} records! Download started.` });
       } else {
         const error = await response.json();
         setFakeMessage({ type: 'error', text: error.error || 'Generation failed' });
@@ -116,8 +116,15 @@ function App() {
   return (
     <div className="container">
       <header className="header">
-        <h1>📋 Precinct Split Updater</h1>
-        <p>Tools for CSV processing & fake data generation</p>
+        <div className="header-brand">
+          <div className="brand-logo">
+            <span className="brand-b">B</span><span className="brand-el">e</span><span className="brand-l">l</span><span className="brand-w">W</span><span className="brand-o">o</span>
+          </div>
+          <div className="header-text">
+            <h1>Data Utilities</h1>
+            <p>CSV Processing &amp; Test Data Generation</p>
+          </div>
+        </div>
       </header>
 
       <div className="tabs">
@@ -125,13 +132,13 @@ function App() {
           className={`tab-btn ${activeTab === 'process' ? 'active' : ''}`}
           onClick={() => setActiveTab('process')}
         >
-          🔢 CSV Processor
+          <span className="tab-icon">📋</span> CSV Processor
         </button>
         <button
           className={`tab-btn ${activeTab === 'generate' ? 'active' : ''}`}
           onClick={() => setActiveTab('generate')}
         >
-          🎭 Fake Data Generator
+          <span className="tab-icon">🎭</span> Test Data Generator
         </button>
       </div>
 
@@ -139,91 +146,105 @@ function App() {
         {/* ====== TAB 1: CSV PROCESSOR ====== */}
         {activeTab === 'process' && (
           <div className="tab-content">
-            <div className="upload-section">
-              <div className="file-input-wrapper">
-                <input
-                  type="file"
-                  accept=".csv"
-                  onChange={handleFileChange}
-                  id="file-input"
-                  className="file-input"
-                />
-                <label htmlFor="file-input" className="file-label">
-                  <span className="upload-icon">📁</span>
-                  <span>{file ? file.name : 'Choose CSV File'}</span>
-                </label>
+            <div className="section-card">
+              <div className="card-header">
+                <h2>Precinct Split Updater</h2>
+                <p>Upload a CSV file with a <strong>Precinct Split</strong> column. The tool will add sequence codes, start page, and end page numbers.</p>
               </div>
-              {file && (
-                <button
-                  className="process-btn"
-                  onClick={handleUpload}
-                  disabled={uploading}
-                >
-                  {uploading ? '⏳ Processing...' : '🚀 Process CSV'}
-                </button>
+              <div className="upload-section">
+                <div className="file-input-wrapper">
+                  <input
+                    type="file"
+                    accept=".csv"
+                    onChange={handleFileChange}
+                    id="file-input"
+                    className="file-input"
+                  />
+                  <label htmlFor="file-input" className="file-label">
+                    <span className="upload-icon">📁</span>
+                    <span>{file ? file.name : 'Choose CSV File'}</span>
+                  </label>
+                </div>
+                {file && (
+                  <button
+                    className="btn-primary"
+                    onClick={handleUpload}
+                    disabled={uploading}
+                  >
+                    {uploading ? '⏳ Processing...' : '🚀 Process CSV'}
+                  </button>
+                )}
+              </div>
+
+              {message && (
+                <div className={`message ${message.type}`}>{message.text}</div>
+              )}
+
+              {preview && (
+                <div className="preview-section">
+                  <h3>📊 Preview (first 5 rows)</h3>
+                  <div className="table-wrapper">
+                    <table className="preview-table">
+                      <thead>
+                        <tr>
+                          {preview.meta.fields.map(field => (
+                            <th key={field}>{field}</th>
+                          ))}
+                          <th className="new-col">Updated Precinct Split Code</th>
+                          <th className="new-col">Start Page</th>
+                          <th className="new-col">End Page</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {preview.data.map((row, i) => (
+                          <tr key={i}>
+                            {preview.meta.fields.map(field => (
+                              <td key={field}>{row[field]}</td>
+                            ))}
+                            <td className="new-col muted">(generated)</td>
+                            <td className="new-col muted">(generated)</td>
+                            <td className="new-col muted">(generated)</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
               )}
             </div>
-
-            {message && (
-              <div className={`message ${message.type}`}>{message.text}</div>
-            )}
-
-            {preview && (
-              <div className="preview-section">
-                <h2>📊 Preview (first 5 rows)</h2>
-                <div className="table-wrapper">
-                  <table className="preview-table">
-                    <thead>
-                      <tr>
-                        {preview.meta.fields.map(field => (
-                          <th key={field}>{field}</th>
-                        ))}
-                        <th className="new-col">Updated Precinct Split Code</th>
-                        <th className="new-col">Start Page</th>
-                        <th className="new-col">End Page</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {preview.data.map((row, i) => (
-                        <tr key={i}>
-                          {preview.meta.fields.map(field => (
-                            <td key={field}>{row[field]}</td>
-                          ))}
-                          <td className="new-col muted">(generated)</td>
-                          <td className="new-col muted">(generated)</td>
-                          <td className="new-col muted">(generated)</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            )}
           </div>
         )}
 
         {/* ====== TAB 2: FAKE DATA GENERATOR ====== */}
         {activeTab === 'generate' && (
           <div className="tab-content">
-            <div className="fake-panel">
+            <div className="section-card">
+              <div className="card-header">
+                <h2>Test Data Generator</h2>
+                <p>Generate realistic fake data for testing. Choose output format, define columns, and set the number of records.</p>
+              </div>
+
               <div className="form-row">
-                <label className="form-label">
-                  📄 Output Format
-                </label>
-                <select
-                  className="form-select"
-                  value={outputFmt}
-                  onChange={e => setOutputFmt(e.target.value)}
-                >
-                  <option value="csv">CSV (.csv)</option>
-                  <option value="excel">Excel (.xlsx)</option>
-                </select>
+                <label className="form-label">📄 Output Format</label>
+                <div className="format-toggle">
+                  <button
+                    className={`format-btn ${outputFmt === 'csv' ? 'active' : ''}`}
+                    onClick={() => setOutputFmt('csv')}
+                  >
+                    CSV (.csv)
+                  </button>
+                  <button
+                    className={`format-btn ${outputFmt === 'excel' ? 'active' : ''}`}
+                    onClick={() => setOutputFmt('excel')}
+                  >
+                    Excel (.xlsx)
+                  </button>
+                </div>
               </div>
 
               <div className="form-row">
                 <label className="form-label">
-                  📋 Column Names
-                  <span className="label-hint">(comma-separated)</span>
+                  📋 Column Names <span className="label-hint">(comma-separated)</span>
                 </label>
                 <textarea
                   className="form-textarea"
@@ -252,9 +273,7 @@ function App() {
               </div>
 
               <div className="form-row">
-                <label className="form-label">
-                  🔢 Number of Records
-                </label>
+                <label className="form-label">🔢 Number of Records</label>
                 <input
                   type="number"
                   className="form-input"
@@ -264,9 +283,9 @@ function App() {
                   max={100000}
                 />
                 <div className="quick-numbers">
-                  {[10, 100, 500, 1000, 5000].map(n => (
+                  {[10, 100, 500, 1000, 5000, 10000].map(n => (
                     <button key={n} className="quick-num-btn" onClick={() => setNumRows(n)}>
-                      {n}
+                      {n.toLocaleString()}
                     </button>
                   ))}
                 </div>
@@ -277,16 +296,16 @@ function App() {
               )}
 
               <button
-                className="process-btn generate-btn"
+                className="btn-primary generate-btn"
                 onClick={handleGenerate}
                 disabled={generating}
               >
-                {generating ? '⏳ Generating...' : `🎲 Generate ${numRows} Fake Records`}
+                {generating ? '⏳ Generating...' : `🎲 Generate ${numRows.toLocaleString()} Fake Records`}
               </button>
 
-              <div className="fake-note">
-                <p>💡 <strong>Tip:</strong> Click column chips to add them quickly. Column names are case-insensitive.</p>
-                <p>Supported: names, emails, addresses, phone numbers, dates, precinct codes, and more.</p>
+              <div className="info-box">
+                <p>💡 <strong>Tip:</strong> Click the column chips to add them quickly. Column names are case-insensitive.</p>
+                <p>Supported types: names, emails, addresses, phone numbers, dates, precinct codes, party names, and more.</p>
               </div>
             </div>
           </div>
@@ -294,7 +313,10 @@ function App() {
       </main>
 
       <footer className="footer">
-        <p>🔢 CSV Processor: Groups by Precinct Split → adds sequence codes & page numbers | 🎭 Fake Generator: Create test data instantly</p>
+        <div className="footer-brand">
+          <span className="footer-logo">BelWo</span>
+          <span className="footer-tagline">Data Utilities — Enterprise Document Solutions</span>
+        </div>
       </footer>
     </div>
   );
