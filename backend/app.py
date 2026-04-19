@@ -8,7 +8,65 @@ import random
 
 app = Flask(__name__)
 CORS(app)
-fake = Faker()
+
+# Use US locale for realistic US/Canada data
+fake_us = Faker('en_US')
+fake_ca = Faker('en_CA')
+
+def get_fake():
+    return random.choice([fake_us, fake_ca])()
+
+FAKE_PROVIDERS = {
+    'firstname':   lambda: fake_us.first_name(),
+    'lastname':     lambda: fake_us.last_name(),
+    'fname':        lambda: fake_us.first_name_male() if random.random() > 0.5 else fake_us.first_name_female(),
+    'fullname':     lambda: fake_us.name(),
+    'name':         lambda: fake_us.name(),
+    'email':        lambda: fake_us.email(),
+    'phone':        lambda: fake_us.phone_number(),
+    'address':      lambda: fake_us.street_address(),
+    'street':       lambda: fake_us.street_name(),
+    'city':         lambda: fake_us.city(),
+    'state':        lambda: fake_us.state(),
+    'zip':          lambda: fake_us.zipcode(),
+    'zipcode':      lambda: fake_us.zipcode(),
+    'country':      lambda: random.choice(['United States', 'Canada']),
+    'company':      lambda: fake_us.company(),
+    'job':          lambda: fake_us.job(),
+    'ssn':          lambda: fake_us.ssn(),
+    'date':         lambda: fake_us.date(),
+    'datetime':     lambda: fake_us.date_time(),
+    'time':         lambda: fake_us.time(),
+    'url':          lambda: fake_us.url(),
+    'username':     lambda: fake_us.user_name(),
+    'password':     lambda: fake_us.password(),
+    'ipv4':         lambda: fake_us.ipv4(),
+    'ipv6':         lambda: fake_us.ipv6(),
+    'mac':          lambda: fake_us.mac_address(),
+    'license':      lambda: fake_us.license_plate(),
+    'latitude':     lambda: str(fake_us.latitude()),
+    'longitude':    lambda: str(fake_us.longitude()),
+    'color':        lambda: fake_us.color_name(),
+    'currency':     lambda: random.choice(['USD', 'CAD']),
+    'price':        lambda: round(random.uniform(5, 500), 2),
+    'number':       lambda: random.randint(1, 100),
+    'integer':      lambda: random.randint(1, 1000),
+    'boolean':      lambda: random.choice(['True', 'False', 'Yes', 'No']),
+    'text':         lambda: fake_us.text(max_nb_chars=50),
+    'paragraph':    lambda: fake_us.paragraph(),
+    'sentence':     lambda: fake_us.sentence(),
+    'precinct':      lambda: f"0{random.randint(1000,9999)}E-{random.randint(1,99)}",
+    'precinctsplit': lambda: f"0{random.randint(1000,9999)}E-{random.randint(1,99)}_{random.randint(1,9)}",
+    'partyname':     lambda: fake_us.last_name(),
+    'partyname1':    lambda: fake_us.first_name(),
+    'resaddress':    lambda: fake_us.street_address(),
+    'mailaddress':   lambda: fake_us.street_address(),
+    'precinctsplitcode': lambda: f"0{random.randint(1000,9999)}E-{random.randint(1,99)}_{random.randint(1,9)}",
+    'id':           lambda: random.randint(1000, 9999),
+    'appcode':      lambda: random.choice(['A', 'B', 'C', 'D']),
+    'partycode':    lambda: random.choice(['REP', 'DEM', 'IND', 'LIB']),
+}
+
 
 def detect_encoding(file_bytes, sample_size=10000):
     """Detect file encoding, fallback to latin-1 for files chardet detects as ascii/iso-8859-1"""
@@ -74,63 +132,11 @@ def process_csv():
         return jsonify({'error': str(e)}), 500
 
 
-FAKE_PROVIDERS = {
-    'firstname': lambda: fake.first_name(),
-    'lastname': lambda: fake.last_name(),
-    'fname': lambda: fake.first_name_male() if random.random() > 0.5 else fake.first_name_female(),
-    'fullname': lambda: fake.name(),
-    'name': lambda: fake.name(),
-    'email': lambda: fake.email(),
-    'phone': lambda: fake.phone_number(),
-    'address': lambda: fake.street_address(),
-    'street': lambda: fake.street_name(),
-    'city': lambda: fake.city(),
-    'state': lambda: fake.state(),
-    'zip': lambda: fake.postcode(),
-    'zipcode': lambda: fake.postcode(),
-    'country': lambda: fake.country(),
-    'company': lambda: fake.company(),
-    'job': lambda: fake.job(),
-    'ssn': lambda: fake.ssn(),
-    'date': lambda: fake.date(),
-    'datetime': lambda: fake.date_time(),
-    'time': lambda: fake.time(),
-    'url': lambda: fake.url(),
-    'username': lambda: fake.user_name(),
-    'password': lambda: fake.password(),
-    'ipv4': lambda: fake.ipv4(),
-    'ipv6': lambda: fake.ipv6(),
-    'mac': lambda: fake.mac_address(),
-    'license': lambda: fake.license_plate(),
-    'latitude': lambda: str(fake.latitude()),
-    'longitude': lambda: str(fake.longitude()),
-    'color': lambda: fake.color_name(),
-    'currency': lambda: fake.currency(),
-    'price': lambda: round(random.uniform(5, 500), 2),
-    'number': lambda: random.randint(1, 100),
-    'integer': lambda: random.randint(1, 1000),
-    'boolean': lambda: random.choice(['True', 'False', 'Yes', 'No']),
-    'text': lambda: fake.text(max_nb_chars=50),
-    'paragraph': lambda: fake.paragraph(),
-    'sentence': lambda: fake.sentence(),
-    'precinct': lambda: f"0{random.randint(1000,9999)}E-{random.randint(1,99)}",
-    'precinctsplit': lambda: f"0{random.randint(1000,9999)}E-{random.randint(1,99)}_{random.randint(1,9)}",
-    'partyname': lambda: fake.last_name(),
-    'partyname1': lambda: fake.first_name(),
-    'resaddress': lambda: fake.street_address(),
-    'mailaddress': lambda: fake.street_address(),
-    ' precinctsplitcode': lambda: f"0{random.randint(1000,9999)}E-{random.randint(1,99)}_{random.randint(1,9)}",
-    'id': lambda: random.randint(1000, 9999),
-    'appcode': lambda: random.choice(['A', 'B', 'C', 'D']),
-    'partycode': lambda: random.choice(['REP', 'DEM', 'IND', 'LIB']),
-}
-
-
 @app.route('/generate-fake', methods=['POST'])
 def generate_fake():
     try:
         data = request.get_json()
-        columns = data.get('columns', [])  # list of column names
+        columns = data.get('columns', [])
         num_rows = int(data.get('numRows', 10))
         output_format = data.get('format', 'csv')
         
@@ -146,13 +152,11 @@ def generate_fake():
             row = {}
             for col in columns:
                 col_lower = col.lower().strip()
-                # Check for matching fake provider
                 provider = FAKE_PROVIDERS.get(col_lower)
                 if provider:
                     row[col] = provider()
                 else:
-                    # Default to name for unrecognized columns
-                    row[col] = fake.name()
+                    row[col] = fake_us.name()
             rows.append(row)
         
         df = pd.DataFrame(rows)
@@ -187,7 +191,6 @@ def generate_fake():
 
 @app.route('/fake-columns', methods=['GET'])
 def get_fake_columns():
-    """Return list of supported column names for autocomplete"""
     return jsonify({'columns': list(FAKE_PROVIDERS.keys())})
 
 
