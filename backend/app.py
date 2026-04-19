@@ -56,9 +56,9 @@ def process_csv():
         # Sort back to original order (optional but nice)
         df = df.sort_index().reset_index(drop=True)
         
-        # Generate CSV output
+        # Generate CSV output (always use utf-8 for output)
         output = io.StringIO()
-        df.to_csv(output, index=False, encoding=encoding)
+        df.to_csv(output, index=False, encoding='utf-8')
         output.seek(0)
         
         return send_file(
