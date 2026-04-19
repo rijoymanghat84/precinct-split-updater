@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Precinct Split Updater - UI Preview</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; }
+    :root {
+      --primary: #1a1a2e;
+      --secondary: #16213e;
+      --accent: #e94560;
+      --bg: #f5f5f5;
+      --card-bg: #ffffff;
+      --text: #333;
+      --muted: #888;
+      --success: #28a745;
+      --error: #dc3545;
+    }
+    .container { min-height: 100vh; display: flex; flex-direction: column; }
+    .header { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; padding: 2rem; text-align: center; }
+    .header h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+    .header p { opacity: 0.8; }
+    .main { flex: 1; max-width: 900px; margin: 2rem auto; padding: 0 1rem; width: 100%; }
+    .upload-section { display: flex; gap: 1rem; align-items: center; justify-content: center; flex-wrap: wrap; margin-bottom: 1.5rem; }
+    .file-input-wrapper { position: relative; }
+    .file-input { display: none; }
+    .file-label { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem; background: var(--card-bg); border: 2px dashed var(--accent); border-radius: 8px; cursor: pointer; color: var(--text); font-weight: 500; transition: all 0.2s; }
+    .file-label:hover { background: #fff0f0; border-color: var(--primary); }
+    .upload-icon { font-size: 1.5rem; }
+    .process-btn { padding: 0.75rem 2rem; background: var(--accent); color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .process-btn:hover:not(:disabled) { background: #d13652; transform: translateY(-1px); }
+    .process-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .message { padding: 1rem; border-radius: 8px; margin-bottom: 1rem; text-align: center; font-weight: 500; }
+    .message.success { background: #d4edda; color: var(--success); border: 1px solid var(--success); }
+    .message.error { background: #f8d7da; color: var(--error); border: 1px solid var(--error); }
+    .preview-section { background: var(--card-bg); border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .preview-section h2 { margin-bottom: 1rem; color: var(--primary); font-size: 1.2rem; }
+    .table-wrapper { overflow-x: auto; }
+    .preview-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    .preview-table th, .preview-table td { padding: 0.5rem; border: 1px solid #ddd; text-align: left; white-space: nowrap; }
+    .preview-table th { background: var(--primary); color: white; }
+    .preview-table tbody tr:hover { background: #f0f0f0; }
+    .new-col { background: #e8f5e9 !important; color: var(--success); font-style: italic; }
+    .muted { color: var(--muted); }
+    .footer { background: var(--primary); color: white; padding: 1rem; text-align: center; font-size: 0.9rem; opacity: 0.8; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <h1>📋 Precinct Split Updater</h1>
+      <p>Upload your CSV file to add Updated Precinct Split Codes</p>
+    </header>
+    <main class="main">
+      <div class="upload-section">
+        <div class="file-input-wrapper">
+          <input type="file" accept=".csv" id="file-input" class="file-input" />
+          <label for="file-input" class="file-label">
+            <span class="upload-icon">📁</span>
+            <span>Choose CSV File</span>
+          </label>
+        </div>
+        <button class="process-btn" disabled>🚀 Process CSV</button>
+      </div>
+      <div class="preview-section">
+        <h2>📊 Preview (first 5 rows)</h2>
+        <div class="table-wrapper">
+          <table class="preview-table">
+            <thead>
+              <tr>
+                <th>ID Number</th>
+                <th>Send to Name</th>
+                <th>Precinct Split</th>
+                <th>Party Code</th>
+                <th>App Type Code</th>
+                <th class="new-col">Updated Precinct Split Code</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1001</td>
+                <td>John Smith</td>
+                <td>01000e1_1</td>
+                <td>REP</td>
+                <td>A</td>
+                <td class="new-col muted">(generated after processing)</td>
+              </tr>
+              <tr>
+                <td>1002</td>
+                <td>Jane Doe</td>
+                <td>01000e1_1</td>
+                <td>DEM</td>
+                <td>B</td>
+                <td class="new-col muted">(generated after processing)</td>
+              </tr>
+              <tr>
+                <td>1003</td>
+                <td>Bob Wilson</td>
+                <td>01000e2_3</td>
+                <td>IND</td>
+                <td>A</td>
+                <td class="new-col muted">(generated after processing)</td>
+              </tr>
+              <tr>
+                <td>1004</td>
+                <td>Alice Brown</td>
+                <td>01000e1_1</td>
+                <td>REP</td>
+                <td>C</td>
+                <td class="new-col muted">(generated after processing)</td>
+              </tr>
+              <tr>
+                <td>1005</td>
+                <td>Charlie Davis</td>
+                <td>01000e2_3</td>
+                <td>DEM</td>
+                <td>B</td>
+                <td class="new-col muted">(generated after processing)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+    <footer class="footer">
+      <p>How it works: Groups by Precinct Split → adds _001, _002, _003... to each row</p>
+    </footer>
+  </div>
+</body>
+</html>
