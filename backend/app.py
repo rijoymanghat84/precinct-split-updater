@@ -48,10 +48,14 @@ def process_csv():
         # Group by Precinct Split and add sequence numbers
         def add_sequence(group):
             group = group.copy()
+            n = len(group)
             # Create Updated Precinct Split Code: original + _zero-padded sequence
             group['Updated Precinct Split Code'] = [
-                f"{code}_{str(i).zfill(3)}" for code, i in zip(group['Precinct Split'], range(1, len(group) + 1))
+                f"{code}_{str(i).zfill(3)}" for code, i in zip(group['Precinct Split'], range(1, n + 1))
             ]
+            # Start Page and End Page: each row gets 2 pages, starting from 1
+            group['Start Page'] = [(i - 1) * 2 + 1 for i in range(1, n + 1)]
+            group['End Page'] = [i * 2 for i in range(1, n + 1)]
             return group
         
         # Apply to each group
