@@ -13,6 +13,7 @@ function App() {
   const [colInput, setColInput] = useState('');
   const [numRows, setNumRows] = useState(100);
   const [outputFmt, setOutputFmt] = useState('csv');
+  const [region, setRegion] = useState('both');
   const [generating, setGenerating] = useState(false);
   const [fakeMessage, setFakeMessage] = useState(null);
   const [availableColumns] = useState([
@@ -89,7 +90,8 @@ function App() {
         body: JSON.stringify({
           columns: colInput.split(',').map(c => c.trim()).filter(c => c),
           numRows: parseInt(numRows),
-          format: outputFmt
+          format: outputFmt,
+          region: region
         })
       });
       if (response.ok) {
@@ -238,6 +240,24 @@ function App() {
                     onClick={() => setOutputFmt('excel')}
                   >
                     Excel (.xlsx)
+                  </button>
+                </div>
+              </div>
+
+              <div className="form-row">
+                <label className="form-label">🌍 Region</label>
+                <div className="format-toggle">
+                  <button
+                    className={`format-btn ${region === 'us' ? 'active' : ''}`}
+                    onClick={() => setRegion('us')}
+                  >
+                    🇺🇸 US Only
+                  </button>
+                  <button
+                    className={`format-btn ${region === 'both' ? 'active' : ''}`}
+                    onClick={() => setRegion('both')}
+                  >
+                    🇨🇦 US + Canada
                   </button>
                 </div>
               </div>

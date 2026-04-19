@@ -13,10 +13,11 @@ fake_us = Faker('en_US')
 fake_ca = Faker('en_CA')
 
 # Country-aware row generator
-def generate_row(columns):
+def generate_row(columns, allowed_countries=None):
     """Generate a single row with country-aware fields."""
-    # Decide country for this row
-    country = random.choice(['United States', 'Canada'])
+    if allowed_countries is None:
+        allowed_countries = ['United States', 'Canada']
+    country = random.choice(allowed_countries)
     
     row = {}
     for col in columns:
@@ -189,6 +190,7 @@ def generate_fake():
         columns = data.get('columns', [])
         num_rows = int(data.get('numRows', 10))
         output_format = data.get('format', 'csv')
+        region = data.get('region', 'both')  # 'us' or 'both'
         
         if not columns:
             return jsonify({'error': 'At least one column is required'}), 400
@@ -196,7 +198,9 @@ def generate_fake():
         if num_rows < 1 or num_rows > 100000:
             return jsonify({'error': 'Number of rows must be between 1 and 100,000'}), 400
         
-        rows = [generate_row(columns) for _ in range(num_rows)]
+        allowed_countries = ['United States'] if region == 'us' else ['United States', 'Canada']
+        
+        rows = [generate_row(columns, allowed_countries) for _ in range(num_rows)]
         df = pd.DataFrame(rows)
         
         if output_format == 'csv':
