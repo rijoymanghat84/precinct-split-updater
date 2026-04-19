@@ -9,9 +9,13 @@ CORS(app)
 
 
 def detect_encoding(file_bytes, sample_size=10000):
-    """Detect file encoding from sample bytes"""
+    """Detect file encoding, fallback to latin-1 which handles most bytes"""
     result = chardet.detect(file_bytes[:sample_size])
-    return result['encoding'] or 'utf-8'
+    detected = result['encoding'] or 'utf-8'
+    # Force common non-utf8 encodings that chardet might misdetect
+    if detected.lower() in ('ascii', 'iso-8859-1', 'windows-1252'):
+        return 'latin-1'
+    return detected
 
 
 @app.route('/health', methods=['GET'])
