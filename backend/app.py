@@ -2,13 +2,22 @@ from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
 import pandas as pd
 import io
+import chardet
 
 app = Flask(__name__)
 CORS(app)
 
+
+def detect_encoding(file_bytes, sample_size=10000):
+    """Detect file encoding from sample bytes"""
+    result = chardet.detect(file_bytes[:sample_size])
+    return result['encoding'] or 'utf-8'
+
+
 @app.route('/health', methods=['GET'])
 def health():
     return jsonify({'status': 'ok'})
+
 
 @app.route('/process', methods=['POST'])
 def process_csv():
@@ -20,8 +29,13 @@ def process_csv():
         return jsonify({'error': 'File must be a CSV'}), 400
     
     try:
-        # Read CSV
-        df = pd.read_csv(file)
+        file_bytes = file.read()
+        
+        # Detect encoding
+        encoding = detect_encoding(file_bytes)
+        
+        # Read CSV with detected encoding
+        df = pd.read_csv(io.BytesIO(file_bytes), encoding=encoding)
         
         # Check if Precinct Split column exists
         if 'Precinct Split' not in df.columns:
@@ -44,7 +58,7 @@ def process_csv():
         
         # Generate CSV output
         output = io.StringIO()
-        df.to_csv(output, index=False)
+        df.to_csv(output, index=False, encoding=encoding)
         output.seek(0)
         
         return send_file(
@@ -56,6 +70,7 @@ def process_csv():
         
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
