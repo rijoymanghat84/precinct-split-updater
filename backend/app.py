@@ -61,8 +61,13 @@ def process_csv():
         # Apply to each group
         df = df.groupby('Precinct Split', group_keys=False).apply(add_sequence)
         
-        # Sort back to original order (optional but nice)
+        # Sort back to original order
         df = df.sort_index().reset_index(drop=True)
+        
+        # Recalculate Start Page / End Page to be continuous across ALL rows
+        total = len(df)
+        df['Start Page'] = [(i - 1) * 2 + 1 for i in range(1, total + 1)]
+        df['End Page'] = [i * 2 for i in range(1, total + 1)]
         
         # Generate CSV output (always use utf-8 for output)
         output = io.StringIO()
